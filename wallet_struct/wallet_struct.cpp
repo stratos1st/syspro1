@@ -59,6 +59,10 @@ bool wallet_struct::is_transaction_possible(transaction_struct *trans){
   return trans->money<=total_money;
 }
 
+char* wallet_struct::get_id(){
+  return wallet_id;
+}
+
 void wallet_struct::print_debug(){
   std::cout << "wallet_struct send_money_total= "<<send_money_total<<
     " recv_money_total= "<<recv_money_total<<
