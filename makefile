@@ -1,8 +1,8 @@
 CC= g++
 CGLAG= -g -Wall
 
-main.out: main.o tree_node.o wallet_struct.o block.o user_block_item.o
-	$(CC) $(CFLAG) -o main.out main.o tree_node.o wallet_struct.o block.o user_block_item.o
+main.out: main.o tree_node.o wallet_struct.o block.o user_block_item.o hash_table.o
+	$(CC) $(CFLAG) -o main.out main.o tree_node.o wallet_struct.o block.o user_block_item.o hash_table.o
 
 main.o: main.cpp
 	$(CC) -c main.cpp
@@ -19,6 +19,9 @@ block.o: ./block/block.cpp ./block/block.hpp
 user_block_item.o: ./user_block_item/user_block_item.cpp ./user_block_item/user_block_item.hpp
 	$(CC) -c ./user_block_item/user_block_item.cpp
 
+hash_table.o: ./hash_table/hash_table.cpp ./hash_table/hash_table.hpp
+	$(CC) -c ./hash_table/hash_table.cpp
+
 .PHONY: clean
 clean:
-	rm -f main.out main.o tree_node.o wallet_struct.o block.o user_block_item.o
+	rm -f main.out main.o tree_node.o wallet_struct.o block.o user_block_item.o hash_table.o

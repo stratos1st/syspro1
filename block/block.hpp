@@ -1,8 +1,8 @@
 #ifndef BLOCK
 #define BLOCK
 
-#include "../wallet_struct/wallet_struct.hpp"
-#include "../tree_node/tree_node.hpp"
+#include "../user_block_item/user_block_item.hpp"
+#include "../bitcoin_struct/bitcoin_struct.hpp"
 #include "../transaction_struct/transaction_struct.hpp"
 #include <string.h>
 
@@ -12,6 +12,8 @@ private:
   T** table;
   unsigned int curr_pos,max_sz;
 public:
+  block* next;
+
   block(unsigned int byte_max_sz);
   ~block();
 
