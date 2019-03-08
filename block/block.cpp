@@ -14,25 +14,9 @@ block<T>::~block(){
 
 }
 
-template<>
-bitcoin_struct* block<bitcoin_struct>::find_in_block(char* id){
-  for(unsigned int i=0;i<max_sz;i++)
-    if(strcmp(table[i]->coin_id,id)==0)
-      return table[i];
-  return nullptr;
-}
-
-template<>
-transaction_struct* block<transaction_struct>::find_in_block(char* id){
-  for(unsigned int i=0;i<max_sz;i++)
-    if(strcmp(table[i]->trans_id,id)==0)
-      return table[i];
-  return nullptr;
-}
-
-template<>
-user_block_item* block<user_block_item>::find_in_block(char* id){
-  for(unsigned int i=0;i<max_sz;i++)
+template<class T>
+T* block<T>::find_in_block(char* id){
+  for(unsigned int i=0;i<curr_pos;i++)
     if(strcmp(table[i]->get_id(),id)==0)
       return table[i];
   return nullptr;
