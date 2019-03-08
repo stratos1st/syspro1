@@ -57,28 +57,10 @@ void hash_table<T>::print_debug(){
   }
 }
 
-template <>
-unsigned int hash_table<user_block_item>::hash_function(user_block_item* item){
+template <class T>
+unsigned int hash_table<T>::hash_function(T* item){
   unsigned int sum=0;
   char* str=item->get_id();
-  for(unsigned int i=0;i<strlen(str);i++)
-    sum+=str[i];
-  return sum%max_sz;
-}
-
-template <>
-unsigned int hash_table<bitcoin_struct>::hash_function(bitcoin_struct* item){
-  unsigned int sum=0;
-  char* str=item->coin_id;
-  for(unsigned int i=0;i<strlen(str);i++)
-    sum+=str[i];
-  return sum%max_sz;
-}
-
-template <>
-unsigned int hash_table<transaction_struct>::hash_function(transaction_struct* item){
-  unsigned int sum=0;
-  char* str=item->trans_id;
   for(unsigned int i=0;i<strlen(str);i++)
     sum+=str[i];
   return sum%max_sz;

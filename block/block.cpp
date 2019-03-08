@@ -53,26 +53,11 @@ bool block<T>::is_full(){
   return curr_pos==max_sz;
 }
 
-template<>
-void block<user_block_item>::print_debug(){
+template<class T>
+void block<T>::print_debug(){
   std::cout << "block currpos= "<<curr_pos<<" max_sz= "<<max_sz << '\n';
   for(unsigned int i=0;i<curr_pos;i++)
     table[i]->print_debug();
-}
-
-template<>
-void block<bitcoin_struct>::print_debug(){
-  std::cout << "block currpos= "<<curr_pos<<" max_sz= "<<max_sz << '\n';
-  for(unsigned int i=0;i<curr_pos;i++)
-    std::cout << "bitcoin_struct coin_id= " <<table[i]->coin_id<< '\n';
-}
-
-template<>
-void block<transaction_struct>::print_debug(){
-  std::cout << "block currpos= "<<curr_pos<<" max_sz= "<<max_sz << '\n';
-  for(unsigned int i=0;i<curr_pos;i++)
-    std::cout << "transaction_struct trans_id= " <<table[i]->trans_id<<
-    " money= "<<table[i]->money<< '\n';
 }
 
 template class block<user_block_item>;
