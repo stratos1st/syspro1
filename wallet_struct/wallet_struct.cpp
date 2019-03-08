@@ -64,7 +64,7 @@ char* wallet_struct::get_id(){
 }
 
 void wallet_struct::print_debug(){
-  std::cout << "wallet_struct send_money_total= "<<send_money_total<<
+  std::cout << "wallet_struct name= " <<wallet_id<<" send_money_total= "<<send_money_total<<
     " recv_money_total= "<<recv_money_total<<
     " total_money= "<<total_money << '\n';
   wallet_node_struct *tmp=start;

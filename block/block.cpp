@@ -55,22 +55,22 @@ bool block<T>::is_full(){
 
 template<>
 void block<user_block_item>::print_debug(){
-  std::cout << "block " << '\n';
-  for(unsigned int i=0;i<max_sz;i++)
+  std::cout << "block currpos= "<<curr_pos<<" max_sz= "<<max_sz << '\n';
+  for(unsigned int i=0;i<curr_pos;i++)
     table[i]->print_debug();
 }
 
 template<>
 void block<bitcoin_struct>::print_debug(){
-  std::cout << "block " << '\n';
-  for(unsigned int i=0;i<max_sz;i++)
+  std::cout << "block currpos= "<<curr_pos<<" max_sz= "<<max_sz << '\n';
+  for(unsigned int i=0;i<curr_pos;i++)
     std::cout << "bitcoin_struct coin_id= " <<table[i]->coin_id<< '\n';
 }
 
 template<>
 void block<transaction_struct>::print_debug(){
-  std::cout << "block " << '\n';
-  for(unsigned int i=0;i<max_sz;i++)
+  std::cout << "block currpos= "<<curr_pos<<" max_sz= "<<max_sz << '\n';
+  for(unsigned int i=0;i<curr_pos;i++)
     std::cout << "transaction_struct trans_id= " <<table[i]->trans_id<<
     " money= "<<table[i]->money<< '\n';
 }

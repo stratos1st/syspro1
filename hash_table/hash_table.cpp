@@ -1,26 +1,28 @@
 #include "hash_table.hpp"
 
 template <class T>
-hast_table<T>::hast_table(unsigned int sz, unsigned int max_block_bytes):block_bytes(max_block_bytes){
+hash_table<T>::hash_table(unsigned int sz, unsigned int max_block_bytes):block_bytes(max_block_bytes){
   max_sz=sz;
   table=new block<T>*[max_sz];
-  for(unsigned int i=0;i<max_sz;i++)
-    table[i]=nullptr;
-  last=nullptr;
+  last=new block<T>*[max_sz];
+  for(unsigned int i=0;i<max_sz;i++){
+    table[i]=new block<T>(max_block_bytes);
+    last[i]=table[i];
+  }
 }
 
 template <class T>
-hast_table<T>::~hast_table(){
+hash_table<T>::~hash_table(){
 
 }
 
 template <class T>
-T* hast_table<T>::find(char* id){
+T* hash_table<T>::find(char* id){
   unsigned int pos=hash_function(id);
   block<T> *i=table[pos];
   T* ans=nullptr;
   while(i!=nullptr){
-    ans=find(id);
+    ans=i->find_in_block(id);
     if(ans!=nullptr)
       return ans;
     i=i->next;
@@ -29,35 +31,34 @@ T* hast_table<T>::find(char* id){
 }
 
 template <class T>
-void hast_table<T>::insert(T* new_item){
+void hash_table<T>::insert(T* new_item){
   unsigned int pos=hash_function(new_item);
-  if (table[pos]==nullptr) {
-    table[pos]=new block<T>(block_bytes);
-    last=table[pos];
-    table[pos]->insert_last(new_item);
-  }
+  if(!last[pos]->is_full())
+    last[pos]->insert_last(new_item);
   else{
-    if(!last->is_full())
-      last->insert_last(new_item);
-    else{
-      last->next=new block<T>(block_bytes);
-      last=last->next;
-      last->insert_last(new_item);
-    }
+    last[pos]->next=new block<T>(block_bytes);
+    last[pos]=last[pos]->next;
+    last[pos]->insert_last(new_item);
   }
-
+  std::cout<<"\n"<<pos<<"\n";
 }
 
 template <class T>
-void hast_table<T>::print_debug(){
+void hash_table<T>::print_debug(){
   std::cout << "hash_table block_bytes= "<<block_bytes<<
   " max_sz= "<<max_sz << '\n';
-  for(unsigned int i=0;i<max_sz;i++)
-    table[i]->print_debug();
+  block<T>* tmp;
+  for(unsigned int i=0;i<max_sz;i++){
+    tmp=table[i];
+    while(tmp!=nullptr){
+      tmp->print_debug();
+      tmp=tmp->next;
+    }
+  }
 }
 
 template <>
-unsigned int hast_table<user_block_item>::hash_function(user_block_item* item){
+unsigned int hash_table<user_block_item>::hash_function(user_block_item* item){
   unsigned int sum=0;
   char* str=item->get_id();
   for(unsigned int i=0;i<strlen(str);i++)
@@ -66,7 +67,7 @@ unsigned int hast_table<user_block_item>::hash_function(user_block_item* item){
 }
 
 template <>
-unsigned int hast_table<bitcoin_struct>::hash_function(bitcoin_struct* item){
+unsigned int hash_table<bitcoin_struct>::hash_function(bitcoin_struct* item){
   unsigned int sum=0;
   char* str=item->coin_id;
   for(unsigned int i=0;i<strlen(str);i++)
@@ -75,7 +76,7 @@ unsigned int hast_table<bitcoin_struct>::hash_function(bitcoin_struct* item){
 }
 
 template <>
-unsigned int hast_table<transaction_struct>::hash_function(transaction_struct* item){
+unsigned int hash_table<transaction_struct>::hash_function(transaction_struct* item){
   unsigned int sum=0;
   char* str=item->trans_id;
   for(unsigned int i=0;i<strlen(str);i++)
@@ -84,7 +85,7 @@ unsigned int hast_table<transaction_struct>::hash_function(transaction_struct* i
 }
 
 template <class T>
-unsigned int hast_table<T>::hash_function(char* str){
+unsigned int hash_table<T>::hash_function(char* str){
   unsigned int sum=0;
   for(unsigned int i=0;i<strlen(str);i++)
     sum+=str[i];
@@ -92,6 +93,6 @@ unsigned int hast_table<T>::hash_function(char* str){
 }
 
 
-template class hast_table<user_block_item>;
-template class hast_table<bitcoin_struct>;
-template class hast_table<transaction_struct>;
+template class hash_table<user_block_item>;
+template class hash_table<bitcoin_struct>;
+template class hash_table<transaction_struct>;

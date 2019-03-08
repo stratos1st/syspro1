@@ -22,6 +22,7 @@ char* user_block_item::get_id(){
 
 void user_block_item::print_debug(){
   std::cout << "user_block_item " << '\n';
+  wallet->print_debug();
   transactions_node_struct *tmp=start;
   while (tmp!=nullptr) {
     std::cout << "transactions_node_struct trans_id= "<<tmp->trans->trans_id<<

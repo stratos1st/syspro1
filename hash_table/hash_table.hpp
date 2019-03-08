@@ -5,18 +5,18 @@
 #include <string.h>
 
 template<class T>
-class hast_table{
+class hash_table{
 private:
   block<T>** table;
-  block<T>* last;
+  block<T>** last;
   unsigned int max_sz;
   const unsigned int block_bytes;
 
   unsigned int hash_function(T* item);
   unsigned int hash_function(char* str);
 public:
-  hast_table(unsigned int sz, unsigned int max_block_bytes);
-  ~hast_table();
+  hash_table(unsigned int sz, unsigned int max_block_bytes);
+  ~hash_table();
 
   T* find(char* id);
   void insert(T* new_item);
