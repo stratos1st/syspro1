@@ -18,6 +18,7 @@ void wallet_struct:: add_initial_coin(bitcoin_struct *coin){
   start->next=tmp;
   start->bitcoin=coin;
   start->leaf_node=coin->root;
+  total_money+=coin->value;
 }
 
 wallet_node_struct* wallet_struct::send_money(transaction_struct *trans, bool increase_flag){
@@ -70,7 +71,6 @@ void wallet_struct::print_debug(){
   wallet_node_struct *tmp=start;
   while (tmp!=nullptr) {
     tmp->leaf_node->print_debug();
-    std::cout << "bitcoin succ_trans= "<<tmp->bitcoin->succ_trans << '\n';
     tmp=tmp->next;
   }
 }

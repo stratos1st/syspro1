@@ -16,7 +16,7 @@ public:
   ~wallet_struct();
 
   void add_initial_coin(bitcoin_struct *coin);
-  wallet_node_struct* send_money(transaction_struct *trans, bool increase_flag);
+  wallet_node_struct* send_money(transaction_struct *trans, bool increase_flag=true);
   void recv_money(wallet_node_struct *new_wallet_list_node);
   unsigned int get_possible_transaction_money();
   bool is_transaction_possible(transaction_struct *trans);

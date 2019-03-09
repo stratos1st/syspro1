@@ -40,7 +40,7 @@ void hash_table<T>::insert(T* new_item){
     last[pos]=last[pos]->next;
     last[pos]->insert_last(new_item);
   }
-  std::cout<<"\n"<<pos<<"\n";
+  //std::cout<<"\n"<<pos<<"\n";
 }
 
 template <class T>

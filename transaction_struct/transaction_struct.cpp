@@ -13,5 +13,5 @@ char* transaction_struct::get_id(){
 }
 
 void transaction_struct::print_debug(){
-  std::cout << "transaction_struct id= "<<trans_id << '\n';
+  std::cout << "transaction_struct id= "<<trans_id<<" money= "<<money << '\n';
 }

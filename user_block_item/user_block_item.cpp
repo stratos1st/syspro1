@@ -11,7 +11,7 @@ user_block_item::~user_block_item(){
 
 void user_block_item::insert_first(transaction_struct* new_transaction){
   transactions_node_struct *new_node=new transactions_node_struct;
-  new_node->next=start->next;
+  new_node->next=start;
   new_node->trans=new_transaction;
   start=new_node;
 }

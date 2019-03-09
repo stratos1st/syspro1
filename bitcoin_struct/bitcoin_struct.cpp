@@ -2,6 +2,7 @@
 
 bitcoin_struct::bitcoin_struct(char* id, unsigned int val):value(val){
   strcpy(coin_id, id);
+  root=new tree_node(val);
 }
 
 bitcoin_struct::~bitcoin_struct(){
@@ -15,4 +16,5 @@ char* bitcoin_struct::get_id(){
 void bitcoin_struct::print_debug(){
   std::cout << "bitcoin_struct coin_id= "<<coin_id<<" value= "<<value
   <<" succ_trans= "<<succ_trans << '\n';
+  root->print_debug();
 }
