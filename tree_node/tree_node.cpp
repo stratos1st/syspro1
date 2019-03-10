@@ -33,6 +33,10 @@ transaction_struct* tree_node::get_transaction(){
   return transaction;
 }
 
+bool tree_node::is_leaf_node(){
+  return from==nullptr && to==nullptr;
+}
+
 void tree_node::print_debug(){
   std::cout << "tree_node curr_money= "<<curr_money << '\n';
 }

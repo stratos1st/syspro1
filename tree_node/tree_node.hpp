@@ -20,6 +20,7 @@ public:
   tree_node* get_to();
   tree_node* get_from();
   transaction_struct* get_transaction();
+  bool is_leaf_node();
 
   void print_debug();
 };

@@ -18,11 +18,15 @@ hash_table<transaction_struct> *ht_transactions;
 int init_urs(char* file_name);
 int make_transaction(transaction_struct *trans);
 int init_transactions(char* file_name);
+void get_valid_transaction_id();
 
-unsigned int BITCOIN_VALUE;
+unsigned int BITCOIN_VALUE, trans_id_append;
+char curr_trans_id[51];
 
 // TODO fix byte size
 int main(int argc, char *argv[]){
+  strcpy(curr_trans_id,"");
+  trans_id_append=0;
   char bitCoinBalancesFile[100],transactionsFile[100];
   unsigned int bytes_per_bucket, num_of_buckets_sender, num_of_buckets_recver,
     num_of_buckets_bitcoin=10, num_of_buckets_transaction=10;
@@ -121,7 +125,8 @@ int main(int argc, char *argv[]){
       // TODO check if date is valid
 
       // TODO make new valid transaction ID
-      transaction_struct *new_trans=new transaction_struct("123");
+      get_valid_transaction_id();
+      transaction_struct *new_trans=new transaction_struct(curr_trans_id);
       new_trans->money=money;
       new_trans->sender=ht_sender->find(id1)->wallet;
       new_trans->recver=ht_sender->find(id2)->wallet;
@@ -133,7 +138,7 @@ int main(int argc, char *argv[]){
 
     }
     else if(strcmp(option,"requestTransactions")==0){
-
+      // TODO requestTransactions
     }
     else if(strcmp(option,"findEarnings")==0){
       id1 = strtok(NULL, " ");
@@ -176,7 +181,13 @@ int main(int argc, char *argv[]){
       cout<<id1<<" "<<ht_bitcoin->find(id1)->succ_trans<<endl;// TODO unspent
     }
     else if(strcmp(option,"traceCoin")==0){
-
+      id1 = strtok(NULL, " ");
+      //printf( "%s\n", id1 );
+      if(ht_bitcoin->find(id1)==nullptr){
+        cerr<<"main bitcoin does not exist "<<id1<<endl;
+        continue;
+      }
+      ht_bitcoin->find(id1)->print_history();
     }
     else if(strcmp(option,"exit")==0){
     cout<<"exiting\n";
@@ -187,12 +198,12 @@ int main(int argc, char *argv[]){
     }
   }
 
-  char a[51];
-  do{
-    cin>>a;
-    if(ht_sender->find(a)!=nullptr)
-      ht_sender->find(a)->print_debug();
-  }while(strcmp(a,"aaa")!=0);
+  // char a[51];
+  // do{
+  //   cin>>a;
+  //   if(ht_sender->find(a)!=nullptr)
+  //     ht_sender->find(a)->print_debug();
+  // }while(strcmp(a,"aaa")!=0);
 
   return 0;
 }
@@ -322,6 +333,8 @@ int init_transactions(char* file_name){
          cerr << "init_transactions trans_id already exisxts "<<tmp << '\n';
          return 1;
        }
+       if(strlen(curr_trans_id)<strlen(tmp))
+          strcpy(curr_trans_id,tmp);
        transaction_struct *new_trans=new transaction_struct(tmp);
        tmp= strtok(NULL, " ");
        if(ht_sender->find(tmp)==nullptr){//check if sender_id exists
@@ -350,4 +363,11 @@ int init_transactions(char* file_name){
   }
 
   return 0;
+}
+
+void get_valid_transaction_id(){
+  char tmp[51];
+  sprintf(tmp, "%d", trans_id_append);
+  strcat(curr_trans_id,tmp);
+  trans_id_append++;
 }

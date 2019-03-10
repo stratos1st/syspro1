@@ -13,7 +13,7 @@ char* transaction_struct::get_id(){
 }
 
 void transaction_struct::print_transaction(){
-  std::cout<<sender->get_id()<<" "<<recver->get_id()<<" "<<money<<std::endl;
+  std::cout<<trans_id<<" "<<sender->get_id()<<" "<<recver->get_id()<<" "<<money<<std::endl;
   // TODO date
 }
 
