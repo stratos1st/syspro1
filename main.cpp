@@ -21,6 +21,7 @@ int init_transactions(char* file_name);
 
 unsigned int BITCOIN_VALUE;
 
+// TODO fix byte size
 int main(int argc, char *argv[]){
   char bitCoinBalancesFile[100],transactionsFile[100];
   unsigned int bytes_per_bucket, num_of_buckets_sender, num_of_buckets_recver,
@@ -88,19 +89,80 @@ int main(int argc, char *argv[]){
   //ht_recver->print_debug();
   //ht_bitcoin->print_debug();
 
-  char a[51];
+  char *buffer=NULL, *option, *tmp;
+  size_t len=0;
   do{
-    cin>>a;
-    if(ht_sender->find(a)!=nullptr)
-      ht_sender->find(a)->print_debug();
-  }while(strcmp(a,"aaa")!=0);
+    while (getline(&buffer, &len, stdin) != -1) {//read line
+       printf("%s", buffer);
+       buffer[strlen(buffer)-1]='\0';
+
+       //take first word
+       option = strtok(buffer, " ");
+       printf( "%s\n", option );
+
+       if(strcmp(option,"requestTransaction")==0){
+         //take transaction information
+         tmp=option;
+         while( tmp != NULL ) {
+            tmp = strtok(NULL, " ");
+            if(tmp==NULL)
+              break;
+            printf("%s\n",tmp);
+
+            //coin_id=strtol(tmp, NULL, 10);
+            //printf("%d\n", coin_id);
+
+            //check if coin exists
+            if(ht_bitcoin->find(tmp)!=nullptr){
+              cerr << "init_urs bitcoin already exisxts "<<tmp << '\n';
+              return 2;
+            }
+            //insert new coin
+            bitcoin_struct* new_coin_item=new bitcoin_struct(tmp, BITCOIN_VALUE);
+            ht_bitcoin->insert(new_coin_item);
+            //coin belongs to usr
+            new_usr_item->wallet->add_initial_coin(new_coin_item);
+         }
+
+
+
+       }
+       else if(strcmp(option,"requestTransactions")==0){
+
+       }
+       else if(strcmp(option,"findEarnings")==0){
+
+       }
+       else if(strcmp(option,"findPayments")==0){
+
+       }
+       else if(strcmp(option,"walletStatus")==0){
+
+       }
+       else if(strcmp(option,"bitCoinStatus")==0){
+
+       }
+       else if(strcmp(option,"traceCoin")==0){
+
+       }
+       else if(strcmp(option,"exit")==0){
+
+       }
+       else{
+
+       }
+
+
+
+    }
+
+  }while(1);
 
   return 0;
 }
 
 int init_urs(char* file_name){
   char *buffer=NULL, *usr_id, *tmp;
-  unsigned int coin_id;
   size_t len=0;
 
   //open file
