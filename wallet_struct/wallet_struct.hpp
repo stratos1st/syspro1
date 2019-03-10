@@ -6,12 +6,15 @@
 #include "../transaction_struct/transaction_struct.hpp"
 #include <string.h>
 
+class transaction_struct;
+
 class wallet_struct{
 private:
   char wallet_id[51];
-  unsigned int send_money_total, recv_money_total, total_money;
   wallet_node_struct *start;
 public:
+  unsigned int send_money_total, recv_money_total,total_money;
+
   wallet_struct(char *usrid);
   ~wallet_struct();
 

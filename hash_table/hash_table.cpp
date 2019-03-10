@@ -6,7 +6,7 @@ hash_table<T>::hash_table(unsigned int sz, unsigned int max_block_bytes):block_b
   table=new block<T>*[max_sz];
   last=new block<T>*[max_sz];
   for(unsigned int i=0;i<max_sz;i++){
-    table[i]=new block<T>(max_block_bytes);
+    table[i]=new block<T>(block_bytes);
     last[i]=table[i];
   }
 }

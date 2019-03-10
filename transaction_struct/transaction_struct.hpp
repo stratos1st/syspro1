@@ -4,6 +4,7 @@
 #include <ctime>
 #include <string.h>
 #include <iostream>
+#include "../wallet_struct/wallet_struct.hpp"
 
 class wallet_struct;
 
@@ -18,6 +19,7 @@ public:
   ~transaction_struct();
 
   char* get_id();
+  void print_transaction();
 
   void print_debug();
 };

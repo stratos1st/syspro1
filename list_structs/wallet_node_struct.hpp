@@ -4,6 +4,9 @@
 #include "../tree_node/tree_node.hpp"
 #include "../bitcoin_struct/bitcoin_struct.hpp"
 
+class tree_node;
+class bitcoin_struct;
+
 struct a{
   struct a *next;
   tree_node *leaf_node;

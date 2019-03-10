@@ -4,6 +4,8 @@
 #include "../transaction_struct/transaction_struct.hpp"
 #include <iostream>
 
+class transaction_struct;
+
 class tree_node{
 private:
   transaction_struct *transaction;

@@ -17,6 +17,7 @@ public:
 
   void insert_first(transaction_struct* new_transaction);
   char* get_id();
+  void print_list();
 
   void print_debug();
 };

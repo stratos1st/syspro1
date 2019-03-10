@@ -80,83 +80,119 @@ int main(int argc, char *argv[]){
     cerr << "main bitCoinBalancesFile.txt is not correct" << '\n';
     return 1;
   }
+  cout<<"read from file "<<bitCoinBalancesFile<<endl;
 
   if(init_transactions(transactionsFile)!=0){
     cerr << "main transactionsFile.txt is not correct" << '\n';
     return 1;
   }
+  cout<<"read from file "<<transactionsFile<<endl;
 
-  //ht_recver->print_debug();
-  //ht_bitcoin->print_debug();
 
-  char *buffer=NULL, *option, *tmp;
+  char *buffer=NULL, *option, *tmp, *id1, *id2;
   size_t len=0;
-  do{
-    while (getline(&buffer, &len, stdin) != -1) {//read line
-       printf("%s", buffer);
-       buffer[strlen(buffer)-1]='\0';
+  unsigned int i=0, money;
+  while (1) {
+    getline(&buffer, &len, stdin);
+    //printf("%s", buffer);
+    buffer[strlen(buffer)-1]='\0';
 
-       //take first word
-       option = strtok(buffer, " ");
-       printf( "%s\n", option );
+    //take first word
+    option = strtok(buffer, " ");
+    //printf( "%s\n", option );
 
-       if(strcmp(option,"requestTransaction")==0){
-         //take transaction information
-         tmp=option;
-         while( tmp != NULL ) {
-            tmp = strtok(NULL, " ");
-            if(tmp==NULL)
-              break;
-            printf("%s\n",tmp);
+    if(strcmp(option,"requestTransaction")==0){
+      //take transaction information
+      id1 = strtok(NULL, " ");
+      //check if usr1 exists
+      if(ht_sender->find(id1)==nullptr){
+        cerr << "main usr1 does not exisxt "<<id1 << '\n';
+        return 2;
+      }
+      id2 = strtok(NULL, " ");
+      //check if usr2 exists
+      if(ht_sender->find(id2)==nullptr){
+        cerr << "main usr2 does not exisxt "<<id2 << '\n';
+        continue;
+      }
+      tmp = strtok(NULL, " ");
+      money=strtol(tmp, NULL, 10);
+      // TODO try to get date
+      // TODO check if date is valid
 
-            //coin_id=strtol(tmp, NULL, 10);
-            //printf("%d\n", coin_id);
+      // TODO make new valid transaction ID
+      transaction_struct *new_trans=new transaction_struct("123");
+      new_trans->money=money;
+      new_trans->sender=ht_sender->find(id1)->wallet;
+      new_trans->recver=ht_sender->find(id2)->wallet;
+      // TODO date
 
-            //check if coin exists
-            if(ht_bitcoin->find(tmp)!=nullptr){
-              cerr << "init_urs bitcoin already exisxts "<<tmp << '\n';
-              return 2;
-            }
-            //insert new coin
-            bitcoin_struct* new_coin_item=new bitcoin_struct(tmp, BITCOIN_VALUE);
-            ht_bitcoin->insert(new_coin_item);
-            //coin belongs to usr
-            new_usr_item->wallet->add_initial_coin(new_coin_item);
-         }
-
-
-
-       }
-       else if(strcmp(option,"requestTransactions")==0){
-
-       }
-       else if(strcmp(option,"findEarnings")==0){
-
-       }
-       else if(strcmp(option,"findPayments")==0){
-
-       }
-       else if(strcmp(option,"walletStatus")==0){
-
-       }
-       else if(strcmp(option,"bitCoinStatus")==0){
-
-       }
-       else if(strcmp(option,"traceCoin")==0){
-
-       }
-       else if(strcmp(option,"exit")==0){
-
-       }
-       else{
-
-       }
-
-
+      if(make_transaction(new_trans)!=0){
+        //delete new_trans;
+      }
 
     }
+    else if(strcmp(option,"requestTransactions")==0){
 
-  }while(1);
+    }
+    else if(strcmp(option,"findEarnings")==0){
+      id1 = strtok(NULL, " ");
+      //printf( "%s\n", id1 );
+      if(ht_recver->find(id1)==nullptr){
+        cerr<<"main user does not exist "<<id1<<endl;
+        continue;
+      }
+      cout<<"user "<<id1<<" has recved a total of "<<
+        ht_recver->find(id1)->wallet->recv_money_total<<" money\n";
+        ht_recver->find(id1)->print_list();
+    }
+    else if(strcmp(option,"findPayments")==0){
+      id1 = strtok(NULL, " ");
+      //printf( "%s\n", id1 );
+      if(ht_sender->find(id1)==nullptr){
+        cerr<<"main user does not exist "<<id1<<endl;
+        continue;
+      }
+      cout<<"user "<<id1<<" has sent a total of "<<
+        ht_sender->find(id1)->wallet->send_money_total<<" money\n";
+        ht_sender->find(id1)->print_list();
+    }
+    else if(strcmp(option,"walletStatus")==0){
+      id1 = strtok(NULL, " ");
+      //printf( "%s\n", id1 );
+      if(ht_sender->find(id1)==nullptr){
+        cerr<<"main user does not exist "<<id1<<endl;
+        continue;
+      }
+      cout<<"total money "<<ht_sender->find(id1)->wallet->total_money<<endl;
+    }
+    else if(strcmp(option,"bitCoinStatus")==0){
+      id1 = strtok(NULL, " ");
+      //printf( "%s\n", id1 );
+      if(ht_bitcoin->find(id1)==nullptr){
+        cerr<<"main bitcoin does not exist "<<id1<<endl;
+        continue;
+      }
+      cout<<id1<<" "<<ht_bitcoin->find(id1)->succ_trans<<endl;// TODO unspent
+    }
+    else if(strcmp(option,"traceCoin")==0){
+
+    }
+    else if(strcmp(option,"exit")==0){
+    cout<<"exiting\n";
+     break;
+    }
+    else{
+     cout<<"!not a valid commad\n";
+    }
+  }
+
+  char a[51];
+  do{
+    cin>>a;
+    if(ht_sender->find(a)!=nullptr)
+      ht_sender->find(a)->print_debug();
+  }while(strcmp(a,"aaa")!=0);
 
   return 0;
 }
@@ -182,10 +218,11 @@ int init_urs(char* file_name){
          return 2;
        }
        //insert new user
-       user_block_item *new_usr_item=new user_block_item();
+       user_block_item *new_usr_item=new user_block_item(),*new_usr_item2=new user_block_item();
        new_usr_item->wallet=new wallet_struct(usr_id);
+       new_usr_item2->wallet=new_usr_item->wallet;
        ht_sender->insert(new_usr_item);
-       ht_recver->insert(new_usr_item);
+       ht_recver->insert(new_usr_item2);
 
        //take coin_id, insert new coins and asign them to usr_id
        tmp=usr_id;

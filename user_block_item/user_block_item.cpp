@@ -20,6 +20,14 @@ char* user_block_item::get_id(){
   return wallet->get_id();
 }
 
+void user_block_item::print_list(){
+  transactions_node_struct *tmp=start;
+  while (tmp!=nullptr) {
+    tmp->trans->print_transaction();
+    tmp=tmp->next;
+  }
+}
+
 void user_block_item::print_debug(){
   std::cout << "user_block_item " << '\n';
   wallet->print_debug();
