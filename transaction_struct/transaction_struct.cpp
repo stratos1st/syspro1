@@ -13,8 +13,10 @@ char* transaction_struct::get_id(){
 }
 
 void transaction_struct::print_transaction(){
-  std::cout<<trans_id<<" "<<sender->get_id()<<" "<<recver->get_id()<<" "<<money<<std::endl;
-  // TODO date
+  char tmp[50];
+  strftime(tmp,50, "%d-%m-%Y %H:%M", date_tm);
+  std::cout<<trans_id<<" "<<sender->get_id()<<" "<<recver->get_id()
+    <<" "<<money<<" "<<tmp<<std::endl;
 }
 
 void transaction_struct::print_debug(){

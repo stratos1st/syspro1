@@ -1,0 +1,37 @@
+read from file bitCoinBalancesFile.txt
+read from file transactionsFile.txt
+requestTransaction richard annie 20 11-03-2019 12:53
+requestTransaction richard annie 20 11-03-2019 12:52
+!wrong time, transaction cancelled
+requestTransaction richard annie 20 11-03-2019 12:54
+requestTransaction richard annie 20 11-03-2018 12:56
+
+!wrong time, transaction cancelled
+requestTransaction richard annie 20
+requestTransaction richard annie 20 11-03-2019 12:58
+requestTransaction richard annie 20 11-03-2019 12:57
+!wrong time, transaction cancelled
+findPayments richard
+user richard has sent a total of 100 money
+321a0123 richard annie 20 11-03-2019 12:58
+321a012 richard annie 20 11-03-2019 12:57
+321a01 richard annie 20 11-03-2019 12:54
+321a0 richard annie 20 11-03-2019 12:53
+23 richard crystalsmith 20 13-02-2018 12:32
+findEarnings richard
+user richard has recved a total of 0 money
+traceCoin 432
+321a0123 richard annie 20 11-03-2019 12:58
+321a012 richard annie 20 11-03-2019 12:57
+321a01 richard annie 20 11-03-2019 12:54
+321a0 richard annie 20 11-03-2019 12:53
+23 richard crystalsmith 20 13-02-2018 12:32
+requestTransaction richard annie 210
+traceCoin 432
+321a0123 richard annie 20 11-03-2019 12:58
+321a012 richard annie 20 11-03-2019 12:58
+321a01 richard annie 20 11-03-2019 12:54
+321a0 richard annie 20 11-03-2019 12:53
+23 richard crystalsmith 20 13-02-2018 12:32
+traceCoin 670
+Segmentation fault (core dumped)

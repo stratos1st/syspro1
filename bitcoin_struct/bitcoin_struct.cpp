@@ -27,6 +27,18 @@ void bitcoin_struct::print_recursive(tree_node *node){
   print_recursive(node->get_to());
 }
 
+unsigned int bitcoin_struct::unspent_money(){
+  if(root->is_leaf_node())
+    return root->get_curr_money();
+  return unspent_recursive(root);
+}
+
+unsigned int bitcoin_struct::unspent_recursive(tree_node *node){
+  if (node->is_leaf_node())
+      return node->get_curr_money();
+  unspent_recursive(node->get_from());
+}
+
 void bitcoin_struct::print_debug(){
   std::cout << "bitcoin_struct coin_id= "<<coin_id<<" value= "<<value
   <<" succ_trans= "<<succ_trans << '\n';

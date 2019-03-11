@@ -12,7 +12,8 @@ class transaction_struct{
 public:
   wallet_struct *sender, *recver;
   char trans_id[51];
-  struct tm *date;
+  struct tm *date_tm;
+  time_t date;
   unsigned int money;
 
   transaction_struct(char* id);

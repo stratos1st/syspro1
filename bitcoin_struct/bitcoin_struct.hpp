@@ -9,6 +9,7 @@ class tree_node;
 class bitcoin_struct{
 private:
   void print_recursive(tree_node *node);
+  unsigned int unspent_recursive(tree_node *node);
 public:
   char coin_id[51];
   unsigned int succ_trans;
@@ -20,6 +21,7 @@ public:
 
   char* get_id();
   void print_history();
+  unsigned int unspent_money();
 
   void print_debug();
 };
