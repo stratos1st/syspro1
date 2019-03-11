@@ -7,12 +7,17 @@
 class tree_node;
 class bitcoin_struct;
 
-struct a{
-  struct a *next;
+class wallet_node_struct{// TODO make it class for destructor
+public:
+  wallet_node_struct *next;
   tree_node *leaf_node;
   bitcoin_struct *bitcoin;
+
+  ~wallet_node_struct(){
+    if(next!=nullptr)
+      delete next;
+  }
 };
 
-typedef struct a wallet_node_struct;
 
 #endif

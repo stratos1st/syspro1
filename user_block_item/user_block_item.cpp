@@ -6,7 +6,8 @@ user_block_item::user_block_item(){
 }
 
 user_block_item::~user_block_item(){
-
+  delete wallet;
+  delete start;
 }
 
 void user_block_item::insert_first(transaction_struct* new_transaction){

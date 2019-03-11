@@ -28,10 +28,11 @@ time_t latest_time;
 // TODO destructors
 int main(int argc, char *argv[]){
   strcpy(curr_trans_id,"");
-  struct tm date;
-  strptime("01-01-1970 00:01", "%d-%m-%Y %H:%M", &date);
-  date.tm_isdst = -1;
-  latest_time = mktime(&date);
+  struct tm *date=new struct tm();
+  strptime("01-01-1970 00:01", "%d-%m-%Y %H:%M", date);
+  date->tm_isdst = -1;
+  latest_time = mktime(date);
+  delete date;
   trans_id_append=0;
   char bitCoinBalancesFile[100],transactionsFile[100];
   unsigned int bytes_per_bucket, num_of_buckets_sender, num_of_buckets_recver,
@@ -156,14 +157,14 @@ int main(int argc, char *argv[]){
       new_trans->date=t;
 
       if(make_transaction(new_trans)!=0){
-        //delete new_trans;
+        //delete new_tran?
       }
 
     }
     else if(strcmp(option,"requestTransactions")==0){
       // TODO requestTransactions
     }
-    else if(strcmp(option,"findEarnings")==0){// TODO date
+    else if(strcmp(option,"findEarnings")==0){
       id1 = strtok(NULL, " ");
       //printf( "%s\n", id1 );
       if(ht_recver->find(id1)==nullptr){
@@ -185,7 +186,7 @@ int main(int argc, char *argv[]){
         ht_sender->find(id1)->wallet->send_money_total<<" money\n";
         ht_sender->find(id1)->print_list();
     }
-    else if(strcmp(option,"walletStatus")==0){
+    else if(strcmp(option,"walletStatus")==0){// TODO date
       id1 = strtok(NULL, " ");
       //printf( "%s\n", id1 );
       if(ht_sender->find(id1)==nullptr){
@@ -228,6 +229,11 @@ int main(int argc, char *argv[]){
   //   if(ht_sender->find(a)!=nullptr)
   //     ht_sender->find(a)->print_debug();
   // }while(strcmp(a,"aaa")!=0);
+
+  delete ht_sender;
+  delete ht_recver;
+  delete ht_bitcoin;
+  delete ht_transactions;
 
   return 0;
 }
@@ -308,15 +314,13 @@ int make_transaction(transaction_struct *trans){
   }
   else{
     unsigned int rest_money=trans->money;
-    //cout<<trans->sender->get_possible_transaction_money()<<endl;
-    transaction_struct *new_tras;
     char tmp[51],tmp1[20];
     unsigned int i=0;
     do{
       strcpy(tmp, trans->get_id());
       sprintf(tmp1,"part%d",i);
       strcat(tmp, tmp1);
-      new_tras=new transaction_struct(tmp);
+      transaction_struct *new_tras=new transaction_struct(tmp);
       new_tras->sender=trans->sender;
       new_tras->recver=trans->recver;
       if(new_tras->sender->get_possible_transaction_money()>=rest_money)
@@ -332,9 +336,8 @@ int make_transaction(transaction_struct *trans){
       ht_recver->find(new_tras->recver->get_id())->insert_first(new_tras);
       rest_money-=new_tras->money;
       i++;
-      //cout<<new_tras->money<<endl;
     }while(rest_money>0);
-    // TODO delete trans;
+    // TODO delete trans?
   }
 
   return 0;
@@ -368,6 +371,7 @@ int init_transactions(char* file_name){
        tmp= strtok(NULL, " ");
        if(ht_sender->find(tmp)==nullptr){//check if sender_id exists
          cerr << "init_transactions sender does not exisxt "<<tmp << '\n';
+         delete new_trans;
          return 2;
        }
        new_trans->sender=ht_sender->find(tmp)->wallet;
@@ -375,6 +379,7 @@ int init_transactions(char* file_name){
        tmp= strtok(NULL, " ");
        if(ht_sender->find(tmp)==nullptr){//check if recver_id exists
          cerr << "init_transactions recver does not exisxt "<<tmp << '\n';
+         delete new_trans;
          return 2;
        }
        new_trans->recver=ht_sender->find(tmp)->wallet;
@@ -398,7 +403,7 @@ int init_transactions(char* file_name){
     fclose(fp);
   }
   else {
-    cerr << "init_transactions Unable to open file"<<file_name<<"\n";
+    cerr << "init_transactions unable to open file"<<file_name<<"\n";
     return 1;
   }
 

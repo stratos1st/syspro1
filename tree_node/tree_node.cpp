@@ -8,7 +8,10 @@ tree_node::tree_node(unsigned int money){
 }
 
 tree_node::~tree_node(){
-
+  if(!is_leaf_node()){
+    delete to;
+    delete from;
+  }
 }
 
 void tree_node::insert_tree_node(transaction_struct *trans){

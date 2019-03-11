@@ -2,10 +2,12 @@
 
 transaction_struct::transaction_struct(char* id){
   strcpy(trans_id,id);
+  date_tm=nullptr;
 }
 
 transaction_struct::~transaction_struct(){
-
+  if(date_tm!=nullptr)
+    delete date_tm;
 }
 
 char* transaction_struct::get_id(){

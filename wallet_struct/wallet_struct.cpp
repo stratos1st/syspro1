@@ -9,7 +9,7 @@ wallet_struct::wallet_struct(char *usrid){
 }
 
 wallet_struct::~wallet_struct(){
-
+  delete start;
 }
 
 void wallet_struct:: add_initial_coin(bitcoin_struct *coin){
@@ -33,7 +33,9 @@ wallet_node_struct* wallet_struct::send_money(transaction_struct *trans, bool in
   start->leaf_node=start->leaf_node->get_from();
   if(start->leaf_node->get_curr_money()==0){//delete from start
     wallet_node_struct *tmp=start->next;
+    start->next=nullptr;
     delete start;
+    start=nullptr;
     start=tmp;
   }
 

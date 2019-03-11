@@ -6,7 +6,7 @@ bitcoin_struct::bitcoin_struct(char* id, unsigned int val):value(val){
 }
 
 bitcoin_struct::~bitcoin_struct(){
-
+  delete root;
 }
 
 char* bitcoin_struct::get_id(){

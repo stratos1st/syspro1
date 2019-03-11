@@ -1,5 +1,5 @@
 CC= g++
-CGLAG= -g -Wall
+CGLAG= -static -ggdb3 -Wall
 
 main.out: main.o transaction_struct.o bitcoin_struct.o tree_node.o wallet_struct.o block.o user_block_item.o hash_table.o
 	$(CC) $(CFLAG) -o main.out main.o transaction_struct.o bitcoin_struct.o tree_node.o wallet_struct.o block.o user_block_item.o hash_table.o

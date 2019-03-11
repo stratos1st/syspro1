@@ -11,7 +11,8 @@ block<T>::block(unsigned int byte_max_sz){
 
 template<class T>
 block<T>::~block(){
-
+  delete[] table;
+  delete next;
 }
 
 template<class T>
