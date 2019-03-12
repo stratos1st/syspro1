@@ -1,11 +1,17 @@
 CC= g++
 CGLAG= -static -ggdb3 -Wall
 
-main.out: main.o transaction_struct.o bitcoin_struct.o tree_node.o wallet_struct.o block.o user_block_item.o hash_table.o
-	$(CC) $(CFLAG) -o main.out main.o transaction_struct.o bitcoin_struct.o tree_node.o wallet_struct.o block.o user_block_item.o hash_table.o
+main.out: main.o wallet_node_struct.o transactions_node_struct.o transaction_struct.o bitcoin_struct.o tree_node.o wallet_struct.o block.o user_block_item.o hash_table.o
+	$(CC) $(CFLAG) -o main.out main.o wallet_node_struct.o transactions_node_struct.o transaction_struct.o bitcoin_struct.o tree_node.o wallet_struct.o block.o user_block_item.o hash_table.o
 
 main.o: main.cpp
 	$(CC) -c main.cpp
+
+wallet_node_struct.o: ./list_structs/wallet_node_struct.cpp ./list_structs/wallet_node_struct.hpp
+	$(CC) -c ./list_structs/wallet_node_struct.cpp
+
+transactions_node_struct.o: ./list_structs/transactions_node_struct.cpp ./list_structs/transactions_node_struct.hpp
+	$(CC) -c ./list_structs/transactions_node_struct.cpp
 
 transaction_struct.o: ./transaction_struct/transaction_struct.cpp ./transaction_struct/transaction_struct.hpp
 	$(CC) -c ./transaction_struct/transaction_struct.cpp
@@ -30,4 +36,4 @@ hash_table.o: ./hash_table/hash_table.cpp ./hash_table/hash_table.hpp
 
 .PHONY: clean
 clean:
-	rm -f main.out main.o transaction_struct.o bitcoin_struct.o tree_node.o wallet_struct.o block.o user_block_item.o hash_table.o
+	rm -f main.out main.o wallet_node_struct.o transactions_node_struct.o transaction_struct.o bitcoin_struct.o tree_node.o wallet_struct.o block.o user_block_item.o hash_table.o

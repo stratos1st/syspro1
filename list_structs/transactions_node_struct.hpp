@@ -4,15 +4,13 @@
 #include "../tree_node/tree_node.hpp"
 #include "../bitcoin_struct/bitcoin_struct.hpp"
 
-class transactions_node_struct{// TODO make it class for destructor
+class transactions_node_struct{
 public:
   transactions_node_struct *next;
   transaction_struct *trans;
 
-  ~transactions_node_struct(){
-    if(next!=nullptr)
-      delete next;
-  }
+  transactions_node_struct();
+  ~transactions_node_struct();
 };
 
 #endif

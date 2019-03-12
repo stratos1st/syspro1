@@ -9,7 +9,8 @@ wallet_struct::wallet_struct(char *usrid){
 }
 
 wallet_struct::~wallet_struct(){
-  delete start;
+  if(start!=nullptr)
+    delete start;
 }
 
 void wallet_struct:: add_initial_coin(bitcoin_struct *coin){
@@ -39,7 +40,7 @@ wallet_node_struct* wallet_struct::send_money(transaction_struct *trans, bool in
     start=tmp;
   }
 
-  wallet_node_struct *ans=new wallet_node_struct;
+  wallet_node_struct *ans=new wallet_node_struct();
   ans->leaf_node=rcver_tree_node;
   ans->bitcoin=coin;
 

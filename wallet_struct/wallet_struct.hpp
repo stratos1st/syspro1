@@ -7,6 +7,7 @@
 #include <string.h>
 
 class transaction_struct;
+class wallet_node_struct;
 
 class wallet_struct{
 private:

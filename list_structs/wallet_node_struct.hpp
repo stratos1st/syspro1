@@ -7,16 +7,14 @@
 class tree_node;
 class bitcoin_struct;
 
-class wallet_node_struct{// TODO make it class for destructor
+class wallet_node_struct{
 public:
   wallet_node_struct *next;
   tree_node *leaf_node;
   bitcoin_struct *bitcoin;
 
-  ~wallet_node_struct(){
-    if(next!=nullptr)
-      delete next;
-  }
+  wallet_node_struct();
+  ~wallet_node_struct();
 };
 
 

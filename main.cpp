@@ -25,7 +25,7 @@ char curr_trans_id[51];
 time_t latest_time;
 
 // TODO fix byte size
-// TODO destructors
+// TODO valgrind check
 int main(int argc, char *argv[]){
   strcpy(curr_trans_id,"");
   struct tm *date=new struct tm();
@@ -86,7 +86,7 @@ int main(int argc, char *argv[]){
   ht_bitcoin=new hash_table<bitcoin_struct>(num_of_buckets_bitcoin, bytes_per_bucket);
   ht_transactions=new hash_table<transaction_struct>(num_of_buckets_transaction, bytes_per_bucket);
 
-  //read usr and bitcoin ftom file
+  //read usr and bitcoin from file
   if(init_urs(bitCoinBalancesFile)!=0){
     cerr << "main bitCoinBalancesFile.txt is not correct" << '\n';
     return 1;
@@ -156,13 +156,76 @@ int main(int argc, char *argv[]){
       new_trans->date_tm=date;
       new_trans->date=t;
 
-      if(make_transaction(new_trans)!=0){
-        //delete new_tran?
-      }
+      if(make_transaction(new_trans)!=0)
+        delete new_trans;
 
     }
     else if(strcmp(option,"requestTransactions")==0){
       // TODO requestTransactions
+      //get sender or file name
+      id1 = strtok(NULL, " ");
+      //get recver or NULL
+      id2 = strtok(NULL, " ");
+
+      FILE *out;
+
+      if(id2==NULL){
+        out=fopen(id1, "r");
+        if(out==NULL){
+          cout<<"cant open transactions file "<<id1<<endl;
+          continue;
+        }
+      }
+      else{
+        out=stdout;
+        if(ht_sender->find(id1)==nullptr){
+          cerr << "main usr1 does not exisxt "<<id1 << '\n';
+          return 2;
+        }
+
+        if(ht_sender->find(id2)==nullptr){
+          cerr << "main usr2 does not exisxt "<<id2 << '\n';
+          continue;
+        }
+        //get money
+        tmp = strtok(NULL, " ");
+        money=strtol(tmp, NULL, 10);
+        //get time
+        tmp = strtok(NULL, "");
+        struct tm *date;
+        time_t t;
+        if(tmp!=NULL){//time is given
+          date=new struct tm();
+          strptime(tmp, "%d-%m-%Y %H:%M;", date);
+          date->tm_isdst = -1;
+          t = mktime(date);
+        }
+        else{//get current time
+          time(&t);
+          date = localtime (&t);
+        }
+        if(difftime(t,latest_time)>0)//if time is acceptable
+          latest_time=t;
+        else{
+          std::cerr << "!wrong time, transaction cancelled" << '\n';
+          continue;
+        }
+
+        //make new transaction
+        get_valid_transaction_id();
+        transaction_struct *new_trans=new transaction_struct(curr_trans_id);
+        new_trans->money=money;
+        new_trans->sender=ht_sender->find(id1)->wallet;
+        new_trans->recver=ht_sender->find(id2)->wallet;
+        new_trans->date_tm=date;
+        new_trans->date=t;
+
+        if(make_transaction(new_trans)!=0)
+          delete new_trans;
+      }
+
+      init_transactions(out);
+
     }
     else if(strcmp(option,"findEarnings")==0){
       id1 = strtok(NULL, " ");
@@ -296,13 +359,12 @@ int init_urs(char* file_name){
     cerr << "init_urs Unable to open file"<<file_name<<"\n";
     return 1;
   }
-
   return 0;
 }
 
 int make_transaction(transaction_struct *trans){
   if(!trans->sender->is_transaction_possible(trans)){//if it can not be done
-    cerr<<"not enought money, transaction "<<trans->trans_id<<" can not be done\n";
+    cout<<"not enought money, transaction "<<trans->trans_id<<" can not be done\n";
     return 1;
   }
 
@@ -311,6 +373,7 @@ int make_transaction(transaction_struct *trans){
     trans->recver->recv_money(trans->sender->send_money(trans));
     ht_sender->find(trans->sender->get_id())->insert_first(trans);
     ht_recver->find(trans->recver->get_id())->insert_first(trans);
+    cout<<"transaction "<<trans->trans_id<<" done\n";
   }
   else{
     unsigned int rest_money=trans->money;
@@ -336,8 +399,10 @@ int make_transaction(transaction_struct *trans){
       ht_recver->find(new_tras->recver->get_id())->insert_first(new_tras);
       rest_money-=new_tras->money;
       i++;
+      cout<<"transaction "<<new_tras->trans_id<<" done\n";
     }while(rest_money>0);
-    // TODO delete trans?
+    trans->date_tm=nullptr;
+    delete trans;
   }
 
   return 0;
