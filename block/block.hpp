@@ -20,6 +20,7 @@ public:
   T* find_in_block(char* id);
   bool insert_last(T* new_item);
   bool is_full();
+  void delete_wallets();
 
   void print_debug();
 };

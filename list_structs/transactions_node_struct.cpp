@@ -6,6 +6,6 @@ transactions_node_struct::transactions_node_struct(){
 }
 
 transactions_node_struct::~transactions_node_struct(){
-  if(next!=nullptr)
-    delete next;
+  // if(next!=nullptr)
+  //   delete next;
 }

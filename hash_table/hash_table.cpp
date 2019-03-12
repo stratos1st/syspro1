@@ -13,8 +13,15 @@ hash_table<T>::hash_table(unsigned int sz, unsigned int max_block_bytes):block_b
 
 template <class T>
 hash_table<T>::~hash_table(){
-  for(unsigned int i=0;i<max_sz;i++)
-    delete table[i];
+  for(unsigned int i=0;i<max_sz;i++){
+    block<T>* current = table[i];
+    block<T>* next;
+    while (current != NULL){
+         next = current->next;
+         delete current;
+         current = next;
+     }
+  }
   delete[] table;
   delete[] last;
 }
@@ -44,6 +51,12 @@ void hash_table<T>::insert(T* new_item){
     last[pos]->insert_last(new_item);
   }
   //std::cout<<"\n"<<pos<<"\n";
+}
+
+template <>
+void hash_table<user_block_item>::delete_wallets(){
+  for(unsigned int i=0;i<max_sz;i++)
+    table[i]->delete_wallets();
 }
 
 template <class T>

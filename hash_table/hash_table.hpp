@@ -20,6 +20,7 @@ public:
 
   T* find(char* id);
   void insert(T* new_item);
+  void delete_wallets();
 
   void print_debug();
 };

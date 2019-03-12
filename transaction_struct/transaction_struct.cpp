@@ -2,12 +2,10 @@
 
 transaction_struct::transaction_struct(char* id){
   strcpy(trans_id,id);
-  date_tm=nullptr;
+  date_tm={0};
 }
 
 transaction_struct::~transaction_struct(){
-  if(date_tm!=nullptr)
-    delete date_tm;
 }
 
 char* transaction_struct::get_id(){
@@ -16,7 +14,7 @@ char* transaction_struct::get_id(){
 
 void transaction_struct::print_transaction(){
   char tmp[50];
-  strftime(tmp,50, "%d-%m-%Y %H:%M", date_tm);
+  strftime(tmp,50, "%d-%m-%Y %H:%M", &date_tm);
   std::cout<<trans_id<<" "<<sender->get_id()<<" "<<recver->get_id()
     <<" "<<money<<" "<<tmp<<std::endl;
 }

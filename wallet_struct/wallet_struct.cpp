@@ -9,8 +9,13 @@ wallet_struct::wallet_struct(char *usrid){
 }
 
 wallet_struct::~wallet_struct(){
-  if(start!=nullptr)
-    delete start;
+  wallet_node_struct* current = start;
+  wallet_node_struct* next;
+  while (current != NULL){
+       next = current->next;
+       delete current;
+       current = next;
+   }
 }
 
 void wallet_struct:: add_initial_coin(bitcoin_struct *coin){
@@ -35,8 +40,7 @@ wallet_node_struct* wallet_struct::send_money(transaction_struct *trans, bool in
   if(start->leaf_node->get_curr_money()==0){//delete from start
     wallet_node_struct *tmp=start->next;
     start->next=nullptr;
-    delete start;
-    start=nullptr;
+      delete start;
     start=tmp;
   }
 
@@ -56,7 +60,9 @@ void wallet_struct::recv_money(wallet_node_struct *new_wallet_list_node){
 }
 
 unsigned int wallet_struct::get_possible_transaction_money(){
-  return start->leaf_node->get_curr_money();
+  if(start!=nullptr)
+    return start->leaf_node->get_curr_money();
+  return 0;
 }
 
 bool wallet_struct::is_transaction_possible(transaction_struct *trans){

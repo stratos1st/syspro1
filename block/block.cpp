@@ -7,12 +7,16 @@ block<T>::block(unsigned int byte_max_sz){
     max_sz=byte_max_sz-sizeof(block);
     max_sz=max_sz/sizeof(T*);
     table=new T*[max_sz];
+    for(unsigned int i=0;i<max_sz;i++)
+      table[i]=nullptr;
 }
 
 template<class T>
 block<T>::~block(){
+  for(unsigned int i=0;i<curr_pos;i++)
+    delete table[i];
   delete[] table;
-  delete next;
+  //delete next;
 }
 
 template<class T>
@@ -36,6 +40,12 @@ bool block<T>::insert_last(T* new_item){
 template<class T>
 bool block<T>::is_full(){
   return curr_pos==max_sz;
+}
+
+template<>
+void block<user_block_item>::delete_wallets(){
+  for(unsigned int i=0;i<curr_pos;i++)
+    delete table[i]->wallet;
 }
 
 template<class T>
