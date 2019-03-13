@@ -9,18 +9,19 @@ wallet_struct::wallet_struct(char *usrid){
 }
 
 wallet_struct::~wallet_struct(){
-  wallet_node_struct* current = start;
-  wallet_node_struct* next;
-  while (current != NULL){
-       next = current->next;
-       delete current;
-       current = next;
-   }
+  // wallet_node_struct* current = start;
+  // wallet_node_struct* next;
+  // while (current != NULL){
+  //      next = current->next;
+  //      delete current;
+  //      current = next;
+  //  }
+  delete start;
 }
 
 void wallet_struct:: add_initial_coin(bitcoin_struct *coin){
   wallet_node_struct *tmp=start;
-  start=new wallet_node_struct;
+  start=new wallet_node_struct();
   start->next=tmp;
   start->bitcoin=coin;
   start->leaf_node=coin->root;

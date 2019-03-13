@@ -10,22 +10,25 @@
 
 using namespace std;
 
-hash_table<user_block_item> *ht_sender;
-hash_table<user_block_item> *ht_recver;
-hash_table<bitcoin_struct> *ht_bitcoin;
-hash_table<transaction_struct> *ht_transactions;
+hash_table<user_block_item> *ht_sender;//sender hash table
+hash_table<user_block_item> *ht_recver;//recever hash table
+hash_table<bitcoin_struct> *ht_bitcoin;//bitcoin hash table
+hash_table<transaction_struct> *ht_transactions;//transactions hash table
+//(used to find if transaction id is unique in O(1))
 
-unsigned int BITCOIN_VALUE, trans_id_append;
-char curr_trans_id[51];
-time_t latest_time;
+unsigned int BITCOIN_VALUE, trans_id_append;//BITCOIN_VALUE initial bitcoin value, counter used in get_valid_transaction_id
+char curr_trans_id[51];//the last produced transaction id used in get_valid_transaction_id
+time_t latest_time;//latest transaction time (used to reject transactions)
 
-int init_urs(char* file_name);
-int make_transaction(transaction_struct *trans);
-int init_transactions(char* file_name);
-void get_valid_transaction_id();
+int init_urs(char* file_name);//reads from file and initialises users and bitcoins
+int make_transaction(transaction_struct *trans);//takes transaction with valid sender,resever,date,id
+//makes the transaction (breaks it into parts if needed). returns 1 if user doents have enought money.returns 0 if succesfull
+int init_transactions(char* file_name);//reads from file and makes all transactions
+void get_valid_transaction_id();//updates curr_trans_id to the next valid program generated transacion id
 
 // TODO valgrind check
 int main(int argc, char *argv[]){
+//---------------------------------------------initialise some globals------------------------------------------
   strcpy(curr_trans_id,"");
   struct tm date={0};
   strptime("01-01-1970 00:01", "%d-%m-%Y %H:%M", &date);
@@ -33,10 +36,10 @@ int main(int argc, char *argv[]){
   latest_time = mktime(&date);
   trans_id_append=0;
   char bitCoinBalancesFile[100],transactionsFile[100];
-  unsigned int bytes_per_bucket, num_of_buckets_sender, num_of_buckets_recver,
-    num_of_buckets_bitcoin, num_of_buckets_transaction;
+  unsigned int bytes_per_bucket=0, num_of_buckets_sender=0, num_of_buckets_recver=0,
+    num_of_buckets_bitcoin=0, num_of_buckets_transaction=0;
 
-  //parsing command line argumets
+//---------------------------------------------parsing command line argumets------------------------------------------
   int opt;
   while((opt = getopt(argc, argv, "a:t:v:s:r:b:")) != -1) {
     switch(opt){
@@ -68,7 +71,9 @@ int main(int argc, char *argv[]){
   }
   num_of_buckets_bitcoin=num_of_buckets_sender*5;
   num_of_buckets_transaction=num_of_buckets_sender*10;
-  bool extra=false;
+
+  //check for command argument errors
+  bool extra=false;//command argument error flag
   if(num_of_buckets_sender<=0 || num_of_buckets_recver<=0 || bytes_per_bucket<30)
     extra=true;
   // optind is for the extra arguments
@@ -76,7 +81,7 @@ int main(int argc, char *argv[]){
     printf("!extra arguments: %s\n", argv[optind]);
     extra=true;
   }
-  if(extra==true){
+  if(extra==true){//exit if arguments are not correct
     cerr << "not correct arguments" << '\n';
     return 2;
   }
@@ -87,32 +92,33 @@ int main(int argc, char *argv[]){
   ht_bitcoin=new hash_table<bitcoin_struct>(num_of_buckets_bitcoin, bytes_per_bucket);
   ht_transactions=new hash_table<transaction_struct>(num_of_buckets_transaction, bytes_per_bucket);
 
-  //read usr and bitcoin from file
-  if(init_urs(bitCoinBalancesFile)!=0){
+//---------------------------------------------read from files------------------------------------------
+  if(init_urs(bitCoinBalancesFile)!=0){//exit if file is not correct format
     cerr << "main bitCoinBalancesFile.txt is not correct" << '\n';
+    //TODO free everything
     return 1;
   }
   cout<<"read from file "<<bitCoinBalancesFile<<endl;
-
-  if(init_transactions(transactionsFile)!=0){
+  if(init_transactions(transactionsFile)!=0){//exit if file is not correct format
     cerr << "main transactionsFile.txt is not correct" << '\n';
+    //TODO free everything
     return 1;
   }
   cout<<"read from file "<<transactionsFile<<endl;
 
-
+//---------------------------------------------wait for command------------------------------------------
   char *buffer=NULL, *option, *tmp, *id1, *id2;
   size_t len=0;
   unsigned int money;
   while (1) {
     getline(&buffer, &len, stdin);
-    buffer[strlen(buffer)-1]='\0';
-    if(strlen(buffer)==0){
+    buffer[strlen(buffer)-1]='\0';//delete '\n'
+    if(strlen(buffer)==0){//if command is 'enter'
       cout<<"!not a valid commad\n";
       continue;
     }
 
-    //get first word
+    //get command (first word)
     option = strtok(buffer, " ");
 
     if(strcmp(option,"requestTransaction")==0){
@@ -162,7 +168,6 @@ int main(int argc, char *argv[]){
 
       if(make_transaction(new_trans)!=0)
         delete new_trans;
-
     }
     else if(strcmp(option,"requestTransactions")==0){
       char *buffer2=NULL;
@@ -174,26 +179,27 @@ int main(int argc, char *argv[]){
       FILE *input_from;
       transaction_struct *new_trans;
 
-      if(id2==NULL){//from file
+      if(id2==NULL){//reqd from file
         input_from=fopen(id1, "r");
         if(input_from==NULL){
           cout<<"can not open transactions file "<<id1<<endl;
           continue;
         }
       }
-      else{//from stdin
+      else{//read from stdin
         input_from=stdin;
+        //make the first transaction
+        //chech if urs id exists
         if(ht_sender->find(id1)==nullptr){
           cerr << "main usr1 does not exisxt "<<id1 << '\n';
           return 2;
         }
-
         if(ht_sender->find(id2)==nullptr){
           cerr << "main usr2 does not exisxt "<<id2 << '\n';
           continue;
         }
         //get money
-        char *question_mark;
+        char *question_mark;//checking if ; exists at the end
         tmp = strtok(NULL, " ");
         money=strtol(tmp, &question_mark, 10);
         //get time
@@ -210,7 +216,7 @@ int main(int argc, char *argv[]){
           }
         }
         else{//get current time
-          if(strcmp(question_mark,";")!=0){
+          if(strcmp(question_mark,";")!=0){//cancel transaction if ; does not exist
             cerr << "main no ; at the end of line !!first transaction can not be done requestTransactions cancelling" << '\n';
             continue;
           }
@@ -239,19 +245,17 @@ int main(int argc, char *argv[]){
 
       //read from input_from loop
       while(getline(&buffer2, &len, input_from) != -1) {//read line
-         buffer2[strlen(buffer2)-1]='\0';
-         if(strcmp(buffer2,"exitTransactions")==0)
+         buffer2[strlen(buffer2)-1]='\0';//delete '\n'
+         if(strcmp(buffer2,"exitTransactions")==0)//exit requestTransactions mode
             break;
 
-         //make new transaction
-         get_valid_transaction_id();
-         new_trans=new transaction_struct(curr_trans_id);
+         get_valid_transaction_id();//get valid transaction id
+         new_trans=new transaction_struct(curr_trans_id);//make new transaction
          //get sender id
          tmp= strtok(buffer2, " ");
          if(ht_sender->find(tmp)==nullptr){//check if sender_id exists
            cerr << "main sender does not exisxt "<<tmp << '\n';
            delete new_trans;
-           tmp=strtok(NULL, ";");
            continue;
          }
          new_trans->sender=ht_sender->find(tmp)->wallet;
@@ -260,7 +264,6 @@ int main(int argc, char *argv[]){
          if(ht_sender->find(tmp)==nullptr){//check if recver_id exists
            cerr << "main recver does not exisxt "<<tmp << '\n';
            delete new_trans;
-           tmp=strtok(NULL, ";");
            continue;
          }
          new_trans->recver=ht_sender->find(tmp)->wallet;
@@ -279,21 +282,19 @@ int main(int argc, char *argv[]){
            if(tmp[strlen(tmp)-1]!=';'){
              cerr << "main no ; at the end of line " << '\n';
              delete new_trans;
-             tmp=strtok(NULL, ";");
              continue;
            }
          }
          else{//get current time
-           if(strcmp(question_mark,";")!=0){
+           if(strcmp(question_mark,";")!=0){//cancel transaction if ; does not exist
              cerr << "main no ; at the end of line " << '\n';
              delete new_trans;
-             tmp=strtok(NULL, ";");
              continue;
            }
            time(&t);
            date = *localtime (&t);
          }
-         if(difftime(t,latest_time)>=0)//if time is acceptable !!LES OR EQUAL BECAUSE READING IS VERRY FAST!!
+         if(difftime(t,latest_time)>=0)//if time is acceptable !!LES OR EQUAL BECAUSE reading from file is verry fast!!
            latest_time=t;
          else{
            std::cerr << "!wrong time, transaction cancelled" << '\n';
@@ -302,6 +303,7 @@ int main(int argc, char *argv[]){
          new_trans->date_tm=date;
          new_trans->date=t;
 
+         //make transaction
          make_transaction(new_trans);
       }
       if(buffer2!=NULL)
@@ -334,6 +336,7 @@ int main(int argc, char *argv[]){
         //get time2
         tmp=strtok(NULL, "");
         if(tmp==NULL){
+          delete id2;
           cout<<"expected time2, command canceled\n";
           continue;
         }
@@ -376,6 +379,7 @@ int main(int argc, char *argv[]){
         //get time2
         tmp=strtok(NULL, "");
         if(tmp==NULL){
+          delete id2;
           cout<<"expected time2, command canceled\n";
           continue;
         }
@@ -394,8 +398,8 @@ int main(int argc, char *argv[]){
         ht_sender->find(id1)->print_list(t1,t2);
     }
     else if(strcmp(option,"walletStatus")==0){
+      //get usr_id
       id1 = strtok(NULL, " ");
-      //printf( "%s\n", id1 );
       if(ht_sender->find(id1)==nullptr){
         cerr<<"main user does not exist "<<id1<<endl;
         continue;
@@ -403,8 +407,8 @@ int main(int argc, char *argv[]){
       cout<<"total money "<<ht_sender->find(id1)->wallet->total_money<<endl;
     }
     else if(strcmp(option,"bitCoinStatus")==0){
+      //get coin id
       id1 = strtok(NULL, " ");
-      //printf( "%s\n", id1 );
       if(ht_bitcoin->find(id1)==nullptr){
         cerr<<"main bitcoin does not exist "<<id1<<endl;
         continue;
@@ -413,8 +417,8 @@ int main(int argc, char *argv[]){
         " "<<ht_bitcoin->find(id1)->unspent_money()<<endl;
     }
     else if(strcmp(option,"traceCoin")==0){
+      //get coin id
       id1 = strtok(NULL, " ");
-      //printf( "%s\n", id1 );
       if(ht_bitcoin->find(id1)==nullptr){
         cerr<<"main bitcoin does not exist "<<id1<<endl;
         continue;
@@ -422,22 +426,17 @@ int main(int argc, char *argv[]){
       ht_bitcoin->find(id1)->print_history();
     }
     else if(strcmp(option,"exit")==0){
-    cout<<"exiting\n";
-     break;
+      cout<<"exiting\n";
+      break;
     }
     else{
      cout<<"!not a valid commad\n";
+     continue;
     }
   }
   free(buffer);
 
-  // char a[51];
-  // do{
-  //   cin>>a;
-  //   if(ht_sender->find(a)!=nullptr)
-  //     ht_sender->find(a)->print_debug();
-  // }while(strcmp(a,"aaa")!=0);
-
+//---------------------------------------------delete everything------------------------------------------
   ht_sender->delete_wallets();
   delete ht_sender;
   delete ht_recver;
@@ -455,15 +454,12 @@ int init_urs(char* file_name){
   FILE *fp;
   fp=fopen(file_name, "r");
   if (fp != NULL){
-    while (getline(&buffer, &len, fp) != -1) {//read line
-      // printf("%s", buffer);
-       buffer[strlen(buffer)-1]='\0';
+    while (getline(&buffer, &len, fp) != -1){//read line
+       buffer[strlen(buffer)-1]='\0';//delete '\n'
 
        //take usr_id
        usr_id = strtok(buffer, " ");
-       //printf( "%s\n", usr_id );
-       //check if usr exists
-       if(ht_sender->find(usr_id)!=nullptr || ht_recver->find(usr_id)!=nullptr){
+       if(ht_sender->find(usr_id)!=nullptr){//check if usr exists
          cerr << "init_urs user already exisxts "<<usr_id << '\n';
          return 2;
        }
@@ -474,19 +470,13 @@ int init_urs(char* file_name){
        ht_sender->insert(new_usr_item);
        ht_recver->insert(new_usr_item2);
 
-       //take coin_id, insert new coins and asign them to usr_id
+       //take coin_ids, insert new coins and asign them to usr_id
        tmp=usr_id;
-       while( tmp != NULL ) {
+       while( tmp != NULL ){
           tmp = strtok(NULL, " ");
           if(tmp==NULL)
             break;
-          //printf("%s\n",tmp);
-          //this is for int coin_id
-          //coin_id=strtol(tmp, NULL, 10);
-          //printf("%d\n", coin_id);
-
-          //check if coin exists
-          if(ht_bitcoin->find(tmp)!=nullptr){
+          if(ht_bitcoin->find(tmp)!=nullptr){//check if coin exists
             cerr << "init_urs bitcoin already exisxts "<<tmp << '\n';
             return 2;
           }
@@ -496,9 +486,6 @@ int init_urs(char* file_name){
           //coin belongs to usr
           new_usr_item->wallet->add_initial_coin(new_coin_item);
        }
-       // free(buffer);
-       // buffer=NULL;
-       // len=0;
     }
     free(buffer);
     fclose(fp);
@@ -523,33 +510,38 @@ int make_transaction(transaction_struct *trans){
     ht_recver->find(trans->recver->get_id())->insert_first(trans);
     cout<<"transaction "<<trans->trans_id<<" done\n";
   }
-  else{
+  else{//if it needs more than one nodes
     unsigned int rest_money=trans->money;
     char tmp[51],tmp1[20];
-    unsigned int i=0;
-    do{
+    unsigned int i=0;//counting parts (for trans id)
+
+    do{//wile not enought money have been given
+      //make new transaction id
       strcpy(tmp, trans->get_id());
       sprintf(tmp1,"part%d",i);
       strcat(tmp, tmp1);
+      //make new transaction
       transaction_struct *new_tras=new transaction_struct(tmp);
       new_tras->sender=trans->sender;
       new_tras->recver=trans->recver;
-      if(new_tras->sender->get_possible_transaction_money()>=rest_money)
+      if(new_tras->sender->get_possible_transaction_money()>=rest_money)//if node has more money than needed
         new_tras->money=rest_money;
-      else
+      else//if node has less money than needed
         new_tras->money=trans->sender->get_possible_transaction_money();
       new_tras->date=trans->date;
       new_tras->date_tm=trans->date_tm;
 
+      //make transaction
       ht_transactions->insert(new_tras);
       new_tras->recver->recv_money(new_tras->sender->send_money(new_tras));
       ht_sender->find(new_tras->sender->get_id())->insert_first(new_tras);
       ht_recver->find(new_tras->recver->get_id())->insert_first(new_tras);
+      //update rest_money
       rest_money-=new_tras->money;
       i++;
       cout<<"transaction "<<new_tras->trans_id<<" done\n";
     }while(rest_money>0);
-    delete trans;
+    delete trans;//because we didnt use that transaction, we alocated new parts
   }
 
   return 0;
@@ -565,19 +557,19 @@ int init_transactions(char* file_name){
   if (fp != NULL){
     struct tm date={0};
     time_t t;
-    while (getline(&buffer, &len, fp) != -1) {//read line
-       //printf("%s", buffer);
-       buffer[strlen(buffer)-1]='\0';
 
-       //make new transaction
+    while (getline(&buffer, &len, fp) != -1) {//read line
+       buffer[strlen(buffer)-1]='\0';//delete '\n'
+
        //get trans id
        tmp = strtok(buffer, " ");
        if(ht_transactions->find(tmp)!=nullptr){//check if trans_id exists
          cerr << "init_transactions trans_id already exisxts "<<tmp << '\n';
          return 1;
        }
-       if(strlen(curr_trans_id)<strlen(tmp))
+       if(strlen(curr_trans_id)<strlen(tmp))//save the longest transation id (ised in get_valid_transaction_id)
           strcpy(curr_trans_id,tmp);
+       //make new transaction
        transaction_struct *new_trans=new transaction_struct(tmp);
        //get sender id
        tmp= strtok(NULL, " ");
@@ -605,10 +597,11 @@ int init_transactions(char* file_name){
        t = mktime(&date);
        new_trans->date_tm=date;
        new_trans->date=t;
-       if(difftime(t,latest_time)>0)
+       if(difftime(t,latest_time)>0)//save the latest transaction time (used to validate transactions)
          latest_time=t;
-
-       make_transaction(new_trans);
+       //make transaction
+       if(make_transaction(new_trans)!=0)
+         delete new_trans;
     }
     free(buffer);
     fclose(fp);
@@ -623,8 +616,8 @@ int init_transactions(char* file_name){
 
 void get_valid_transaction_id(){
   char tmp[51];
-  sprintf(tmp, "a%d", trans_id_append);
-  curr_trans_id[strlen(curr_trans_id)-strlen(tmp)]='\0';
-  strcat(curr_trans_id,tmp);
+  sprintf(tmp, "a%d", trans_id_append);//append a%d
+  curr_trans_id[strlen(curr_trans_id)-strlen(tmp)]='\0';//delete previous a%d part
+  strcat(curr_trans_id,tmp);//append new a%d part
   trans_id_append++;
 }

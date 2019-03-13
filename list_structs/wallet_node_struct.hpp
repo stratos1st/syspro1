@@ -9,13 +9,11 @@ class bitcoin_struct;
 
 class wallet_node_struct{
 public:
-  wallet_node_struct *next;
-  tree_node *leaf_node;
-  bitcoin_struct *bitcoin;
+  wallet_node_struct *next;//pointer to the next node
+  tree_node *leaf_node;//pointer to leaf_node that coresonds to money owned from a bitcoin
+  bitcoin_struct *bitcoin;//pointer to bitcoin struct (needed to increase bitcoin->succ_trans)
 
   wallet_node_struct();
-  ~wallet_node_struct();
+  ~wallet_node_struct();//deletes next
 };
-
-
 #endif

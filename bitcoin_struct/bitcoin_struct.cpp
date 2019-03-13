@@ -3,6 +3,7 @@
 bitcoin_struct::bitcoin_struct(char* id, unsigned int val):value(val){
   strcpy(coin_id, id);
   root=new tree_node(val);
+  succ_trans=0;
 }
 
 bitcoin_struct::~bitcoin_struct(){

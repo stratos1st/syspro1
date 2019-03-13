@@ -7,13 +7,14 @@ user_block_item::user_block_item(){
 
 user_block_item::~user_block_item(){
   //delete wallet;
-  transactions_node_struct* current = start;
-  transactions_node_struct* next;
-  while (current != NULL){
-       next = current->next;
-       delete current;
-       current = next;
-   }
+  // transactions_node_struct* current = start;
+  // transactions_node_struct* next;
+  // while (current != NULL){
+  //      next = current->next;
+  //      delete current;
+  //      current = next;
+  //  }
+  delete start;
 }
 
 void user_block_item::insert_first(transaction_struct* new_transaction){

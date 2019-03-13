@@ -6,11 +6,11 @@
 
 class transactions_node_struct{
 public:
-  transactions_node_struct *next;
-  transaction_struct *trans;
+  transactions_node_struct *next;//pointer to the next node
+  transaction_struct *trans;//pointer to transaction information
 
   transactions_node_struct();
-  ~transactions_node_struct();
+  ~transactions_node_struct();//deletes next
 };
 
 #endif

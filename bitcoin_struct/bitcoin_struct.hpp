@@ -8,20 +8,20 @@ class tree_node;
 
 class bitcoin_struct{
 private:
-  void print_recursive(tree_node *node);
-  unsigned int unspent_recursive(tree_node *node);
+  void print_recursive(tree_node *node);// used in print_history
+  unsigned int unspent_recursive(tree_node *node);// used in unspent_money
 public:
   char coin_id[51];
-  unsigned int succ_trans;
-  tree_node *root;
-  const unsigned int value;
+  unsigned int succ_trans;//number of successiful transactions
+  tree_node *root;// pointer to tree root
+  const unsigned int value;// starting bitcoin value
 
-  bitcoin_struct(char* id, unsigned int val);
-  ~bitcoin_struct();
+  bitcoin_struct(char* id, unsigned int val);//initializer
+  ~bitcoin_struct();// deletes tree
 
-  char* get_id();
-  void print_history();
-  unsigned int unspent_money();
+  char* get_id();//returns coin_id
+  void print_history();//prints coin history
+  unsigned int unspent_money();// returns unspent money
 
   void print_debug();
 };

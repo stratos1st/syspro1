@@ -13,10 +13,10 @@ block<T>::block(unsigned int byte_max_sz){
 
 template<class T>
 block<T>::~block(){
-  for(unsigned int i=0;i<curr_pos;i++)
-    delete table[i];
+   for(unsigned int i=0;i<curr_pos;i++)
+     delete table[i];
   delete[] table;
-  //delete next;
+  delete next;
 }
 
 template<class T>

@@ -13,15 +13,17 @@ hash_table<T>::hash_table(unsigned int sz, unsigned int max_block_bytes):block_b
 
 template <class T>
 hash_table<T>::~hash_table(){
-  for(unsigned int i=0;i<max_sz;i++){
-    block<T>* current = table[i];
-    block<T>* next;
-    while (current != NULL){
-         next = current->next;
-         delete current;
-         current = next;
-     }
-  }
+  // for(unsigned int i=0;i<max_sz;i++){
+  //   block<T>* current = table[i];
+  //   block<T>* next;
+  //   while (current != NULL){
+  //        next = current->next;
+  //        delete current;
+  //        current = next;
+  //    }
+  // }
+  for(unsigned int i=0;i<max_sz;i++)
+    delete table[i];
   delete[] table;
   delete[] last;
 }
