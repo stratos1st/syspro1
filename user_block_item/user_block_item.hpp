@@ -3,6 +3,7 @@
 
 #include "../wallet_struct/wallet_struct.hpp"
 #include "../list_structs/transactions_node_struct.hpp"
+#include <ctime>
 
 class user_block_item{
 private:
@@ -17,7 +18,7 @@ public:
 
   void insert_first(transaction_struct* new_transaction);
   char* get_id();
-  void print_list();
+  void print_list(time_t time1={0}, time_t time2={0});
 
   void print_debug();
 };

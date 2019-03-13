@@ -27,10 +27,11 @@ char* user_block_item::get_id(){
   return wallet->get_id();
 }
 
-void user_block_item::print_list(){
+void user_block_item::print_list(time_t time1, time_t time2){
   transactions_node_struct *tmp=start;
   while (tmp!=nullptr) {
-    tmp->trans->print_transaction();
+    if((time1==0 && time2==0) || (difftime(tmp->trans->date,time1)>=0.0 && difftime(tmp->trans->date,time2)<=0.0))
+      tmp->trans->print_transaction();
     tmp=tmp->next;
   }
 }

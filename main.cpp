@@ -34,7 +34,7 @@ int main(int argc, char *argv[]){
   trans_id_append=0;
   char bitCoinBalancesFile[100],transactionsFile[100];
   unsigned int bytes_per_bucket, num_of_buckets_sender, num_of_buckets_recver,
-    num_of_buckets_bitcoin=10, num_of_buckets_transaction=10;
+    num_of_buckets_bitcoin, num_of_buckets_transaction;
 
   //parsing command line argumets
   int opt;
@@ -66,9 +66,12 @@ int main(int argc, char *argv[]){
         break;
     }
   }
-  // TODO check for correctness of arguments
-  // optind is for the extra arguments
+  num_of_buckets_bitcoin=num_of_buckets_sender*5;
+  num_of_buckets_transaction=num_of_buckets_sender*10;
   bool extra=false;
+  if(num_of_buckets_sender<=0 || num_of_buckets_recver<=0 || bytes_per_bucket<30)
+    extra=true;
+  // optind is for the extra arguments
   for(; optind < argc; optind++){
     printf("!extra arguments: %s\n", argv[optind]);
     extra=true;
@@ -307,28 +310,90 @@ int main(int argc, char *argv[]){
         fclose(input_from);
     }
     else if(strcmp(option,"findEarnings")==0){
+      //get usr
       id1 = strtok(NULL, " ");
-      //printf( "%s\n", id1 );
       if(ht_recver->find(id1)==nullptr){
         cerr<<"main user does not exist "<<id1<<endl;
         continue;
       }
+      //get time1.1
+      id2=new char[100];
+      tmp=strtok(NULL, " ");
+      time_t t1={0},t2={0};
+      if(tmp!=NULL){//time1 exists
+        strcpy(id2, tmp);
+        strcat(id2, " ");
+        //get time1.2
+        tmp=strtok(NULL, " ");
+        if(tmp==NULL){
+          delete id2;
+          cout<<"wrong time1, command canceled\n";
+          continue;
+        }
+        strcat(id2, tmp);
+        //get time2
+        tmp=strtok(NULL, "");
+        if(tmp==NULL){
+          cout<<"expected time2, command canceled\n";
+          continue;
+        }
+        struct tm date1={0},date2={0};
+        strptime(id2, "%d-%m-%Y %H:%M", &date1);
+        date1.tm_isdst = -1;
+        strptime(tmp, "%d-%m-%Y %H:%M", &date2);
+        date2.tm_isdst = -1;
+        t1 = mktime(&date1);
+        t2 = mktime(&date2);
+      }
+      delete id2;
+
       cout<<"user "<<id1<<" has recved a total of "<<
         ht_recver->find(id1)->wallet->recv_money_total<<" money\n";
-        ht_recver->find(id1)->print_list();
+        ht_recver->find(id1)->print_list(t1,t2);
     }
-    else if(strcmp(option,"findPayments")==0){// TODO date
+    else if(strcmp(option,"findPayments")==0){
+      //get usr
       id1 = strtok(NULL, " ");
-      //printf( "%s\n", id1 );
-      if(ht_sender->find(id1)==nullptr){
+      if(ht_recver->find(id1)==nullptr){
         cerr<<"main user does not exist "<<id1<<endl;
         continue;
       }
-      cout<<"user "<<id1<<" has sent a total of "<<
-        ht_sender->find(id1)->wallet->send_money_total<<" money\n";
-        ht_sender->find(id1)->print_list();
+      //get time1.1
+      id2=new char[100];
+      tmp=strtok(NULL, " ");
+      time_t t1={0},t2={0};
+      if(tmp!=NULL){//time1 exists
+        strcpy(id2, tmp);
+        strcat(id2, " ");
+        //get time1.2
+        tmp=strtok(NULL, " ");
+        if(tmp==NULL){
+          delete id2;
+          cout<<"wrong time1, command canceled\n";
+          continue;
+        }
+        strcat(id2, tmp);
+        //get time2
+        tmp=strtok(NULL, "");
+        if(tmp==NULL){
+          cout<<"expected time2, command canceled\n";
+          continue;
+        }
+        struct tm date1={0},date2={0};
+        strptime(id2, "%d-%m-%Y %H:%M", &date1);
+        date1.tm_isdst = -1;
+        strptime(tmp, "%d-%m-%Y %H:%M", &date2);
+        date2.tm_isdst = -1;
+        t1 = mktime(&date1);
+        t2 = mktime(&date2);
+      }
+      delete id2;
+
+      cout<<"user "<<id1<<" has recved a total of "<<
+        ht_sender->find(id1)->wallet->recv_money_total<<" money\n";
+        ht_sender->find(id1)->print_list(t1,t2);
     }
-    else if(strcmp(option,"walletStatus")==0){// TODO date
+    else if(strcmp(option,"walletStatus")==0){
       id1 = strtok(NULL, " ");
       //printf( "%s\n", id1 );
       if(ht_sender->find(id1)==nullptr){
