@@ -114,7 +114,7 @@ int main(int argc, char *argv[]){
     getline(&buffer, &len, stdin);
     buffer[strlen(buffer)-1]='\0';//delete '\n'
     if(strlen(buffer)==0){//if command is 'enter'
-      cout<<"!not a valid commad\n";
+      cout<<"!not a valid command\n";
       continue;
     }
 
@@ -317,7 +317,8 @@ int main(int argc, char *argv[]){
          new_trans->date=t;
 
          //make transaction
-         make_transaction(new_trans);
+         if(make_transaction(new_trans)!=0)
+          delete new_trans;
       }
       if(buffer2!=NULL)
         free(buffer2);
@@ -361,7 +362,7 @@ int main(int argc, char *argv[]){
         t1 = mktime(&date1);
         t2 = mktime(&date2);
       }
-      delete id2;
+      delete[] id2;
 
       cout<<"user "<<id1<<" has recved a total of "<<
         ht_recver->find(id1)->wallet->recv_money_total<<" money\n";
@@ -404,7 +405,7 @@ int main(int argc, char *argv[]){
         t1 = mktime(&date1);
         t2 = mktime(&date2);
       }
-      delete id2;
+      delete[] id2;
 
       cout<<"user "<<id1<<" has recved a total of "<<
         ht_sender->find(id1)->wallet->recv_money_total<<" money\n";
@@ -443,7 +444,7 @@ int main(int argc, char *argv[]){
       break;
     }
     else{
-     cout<<"!not a valid commad\n";
+     cout<<"!not a valid command\n";
      continue;
     }
   }
@@ -453,8 +454,8 @@ int main(int argc, char *argv[]){
   ht_sender->delete_wallets();
   delete ht_sender;
   delete ht_recver;
-  delete ht_bitcoin;
   delete ht_transactions;
+  delete ht_bitcoin;
 
   return 0;
 }
@@ -630,7 +631,8 @@ int init_transactions(char* file_name){
 void get_valid_transaction_id(){
   char tmp[51];
   sprintf(tmp, "a%d", trans_id_append);//append a%d
-  curr_trans_id[strlen(curr_trans_id)-strlen(tmp)]='\0';//delete previous a%d part
+  if(trans_id_append!=0)
+    curr_trans_id[strlen(curr_trans_id)-strlen(tmp)]='\0';//delete previous a%d part
   strcat(curr_trans_id,tmp);//append new a%d part
   trans_id_append++;
 }

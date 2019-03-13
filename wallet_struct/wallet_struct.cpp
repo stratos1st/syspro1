@@ -41,7 +41,7 @@ wallet_node_struct* wallet_struct::send_money(transaction_struct *trans, bool in
   if(start->leaf_node->get_curr_money()==0){//delete from start
     wallet_node_struct *tmp=start->next;
     start->next=nullptr;
-      delete start;
+    delete start;
     start=tmp;
   }
 

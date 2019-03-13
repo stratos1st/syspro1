@@ -24,7 +24,9 @@ continue normally. For each successful transaction a message with the transactio
 
 The hash function used is trial. The size of blocks and number of buckets in
 ht_bitcoin and ht_transactions is NOT chosen. These factors can reduce the time
-efficiency of the program for large inputs.  
+efficiency of the program for large inputs.
+Even if a transaction gets canceled get_valid_transaction_id considers its id non
+valid (doesn't "free" it).
 
 !! IMPORTANT differences !!
 1 findPayments and findEarnings format is a little different.

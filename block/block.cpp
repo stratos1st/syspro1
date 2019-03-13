@@ -16,7 +16,8 @@ block<T>::~block(){
    for(unsigned int i=0;i<curr_pos;i++)
      delete table[i];
   delete[] table;
-  delete next;
+  if(next!=nullptr)
+    delete next;
 }
 
 template<class T>
@@ -46,6 +47,8 @@ template<>
 void block<user_block_item>::delete_wallets(){
   for(unsigned int i=0;i<curr_pos;i++)
     delete table[i]->wallet;
+  if(next!=nullptr)
+    next->delete_wallets();
 }
 
 template<class T>
