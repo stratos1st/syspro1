@@ -69,8 +69,8 @@ int main(int argc, char *argv[]){
         break;
     }
   }
-  num_of_buckets_bitcoin=num_of_buckets_sender*5;
-  num_of_buckets_transaction=num_of_buckets_sender*10;
+  num_of_buckets_bitcoin=num_of_buckets_sender*5;// chosen "randomly"
+  num_of_buckets_transaction=num_of_buckets_sender*10;// chosen "randomly"
 
   //check for command argument errors
   bool extra=false;//command argument error flag
@@ -124,14 +124,18 @@ int main(int argc, char *argv[]){
     if(strcmp(option,"requestTransaction")==0){
       //get sender
       id1 = strtok(NULL, " ");
-      if(ht_sender->find(id1)==nullptr){
+      if(ht_sender->find(id1)==nullptr){//check if usr exists
         cerr << "main usr1 does not exisxt "<<id1 << '\n';
         return 2;
       }
       //get recver
       id2 = strtok(NULL, " ");
-      if(ht_sender->find(id2)==nullptr){
+      if(ht_sender->find(id2)==nullptr){//check if usr exists
         cerr << "main usr2 does not exisxt "<<id2 << '\n';
+        continue;
+      }
+      if(strcmp(id1,id2)==0){//check if id1 and id2 are defferent
+        cerr << "main user id's must be different "<< '\n';
         continue;
       }
       //get money
@@ -190,12 +194,16 @@ int main(int argc, char *argv[]){
         input_from=stdin;
         //make the first transaction
         //chech if urs id exists
-        if(ht_sender->find(id1)==nullptr){
+        if(ht_sender->find(id1)==nullptr){//check if usr exists
           cerr << "main usr1 does not exisxt "<<id1 << '\n';
           return 2;
         }
-        if(ht_sender->find(id2)==nullptr){
+        if(ht_sender->find(id2)==nullptr){//check if usr exists
           cerr << "main usr2 does not exisxt "<<id2 << '\n';
+          continue;
+        }
+        if(strcmp(id1,id2)==0){//check if id1 and id2 are defferent
+          cerr << "main user id's must be different "<< '\n';
           continue;
         }
         //get money
@@ -252,21 +260,26 @@ int main(int argc, char *argv[]){
          get_valid_transaction_id();//get valid transaction id
          new_trans=new transaction_struct(curr_trans_id);//make new transaction
          //get sender id
-         tmp= strtok(buffer2, " ");
-         if(ht_sender->find(tmp)==nullptr){//check if sender_id exists
-           cerr << "main sender does not exisxt "<<tmp << '\n';
+         id1= strtok(buffer2, " ");
+         if(ht_sender->find(id1)==nullptr){//check if sender_id exists
+           cerr << "main sender does not exisxt "<<id1 << '\n';
            delete new_trans;
            continue;
          }
-         new_trans->sender=ht_sender->find(tmp)->wallet;
+         new_trans->sender=ht_sender->find(id1)->wallet;
          //get recver id
-         tmp= strtok(NULL, " ");
-         if(ht_sender->find(tmp)==nullptr){//check if recver_id exists
-           cerr << "main recver does not exisxt "<<tmp << '\n';
+         id2= strtok(NULL, " ");
+         if(ht_sender->find(id2)==nullptr){//check if recver_id exists
+           cerr << "main recver does not exisxt "<<id2 << '\n';
            delete new_trans;
            continue;
          }
-         new_trans->recver=ht_sender->find(tmp)->wallet;
+         new_trans->recver=ht_sender->find(id2)->wallet;
+         if(strcmp(id1,id2)==0){//check if id1 and id2 are defferent
+           cerr << "main user id's must be different "<< '\n';
+           delete new_trans;
+           continue;
+         }
          //get money
          tmp=strtok(NULL, " ");
          char *question_mark;

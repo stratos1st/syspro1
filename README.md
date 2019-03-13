@@ -13,8 +13,18 @@ val3:   number of buckets in receiver's hash table (unsigned int>0) (h2)
 val4:   bucket size in bytes (unsigned int>=30)
 
 !ALL arguments must be given!
-if the user gives more arguments or the arguments don't meet the requirements
-the program will terminate.
+If the user gives more arguments or the arguments don't meet the requirements
+the program will terminate. If any of the files doesn't meet the following requirements
+the program terminates. 1 all id's (transaction, user, coin) must be different,
+2 each transaction must be in the right format, 3 Bit Coin Balance File must be on
+a specific format, 4 each transaction must be valid (must follow the rules of requestTransaction).
+If a transaction from Transactions File can't be done due to lack of money an error
+message will be printed, the transaction will be canceled and the program will
+continue normally. For each successful transaction a message with the transactionID will appear.
+
+The hash function used is trial. The size of blocks and number of buckets in
+ht_bitcoin and ht_transactions is NOT chosen. These factors can reduce the time
+efficiency of the program for large inputs.  
 
 !! IMPORTANT differences !!
 1 findPayments and findEarnings format is a little different.
@@ -26,6 +36,7 @@ the program will terminate.
   To be more accurate, all that depends on the number of tree_nodes used in each
   transaction and not the number of different bitcoins.
 3 transactionID is, like any other id value, a string (of size 51) and not an integer.
+4 bitcoinID is, like any other id value, a string (of size 51) and not an integer.
 
 
 ones the program starts it can take the following commands:
@@ -36,7 +47,7 @@ ones the program starts it can take the following commands:
     The transaction will be canceled with an
     error message if one of the following is true: 1 either userID does not
     exist, 2 sender hasn't got enough money, 3 [date time] represents a time
-    before the last transaction. Otherwise the transaction will be completed and
+    before the last transaction, 4 senderID and recverID are the same. Otherwise the transaction will be completed and
     the user will be informed with a message informing him with the id that was
     assigned to the transaction.
 
@@ -46,7 +57,7 @@ ones the program starts it can take the following commands:
     The transaction will be canceled with an
     error message if one of the following is true: 1 either userID does not
     exist, 2 sender hasn't got enough money, 3 [date time] represents a time
-    before the last transaction, 4 the line does not end with a ;.
+    before the last transaction, 4 the line does not end with a ;, , 5 senderID and recverID are the same.
     Otherwise the transaction will be completed and
     the user will be informed with a message informing him with the id that was
     assigned to the transaction. While in requestTransactions mode the user can
