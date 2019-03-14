@@ -26,7 +26,7 @@ int make_transaction(transaction_struct *trans);//takes transaction with valid s
 int init_transactions(char* file_name);//reads from file and makes all transactions
 void get_valid_transaction_id();//updates curr_trans_id to the next valid program generated transacion id
 
-// TODO valgrind check
+//----------------------------------------- MAIN -----------------------------------
 int main(int argc, char *argv[]){
 //---------------------------------------------initialise some globals------------------------------------------
   strcpy(curr_trans_id,"");
@@ -95,13 +95,21 @@ int main(int argc, char *argv[]){
 //---------------------------------------------read from files------------------------------------------
   if(init_urs(bitCoinBalancesFile)!=0){//exit if file is not correct format
     cerr << "main bitCoinBalancesFile.txt is not correct" << '\n';
-    //TODO free everything
+    ht_sender->delete_wallets();
+    delete ht_sender;
+    delete ht_recver;
+    delete ht_transactions;
+    delete ht_bitcoin;
     return 1;
   }
   cout<<"read from file "<<bitCoinBalancesFile<<endl;
   if(init_transactions(transactionsFile)!=0){//exit if file is not correct format
     cerr << "main transactionsFile.txt is not correct" << '\n';
-    //TODO free everything
+    ht_sender->delete_wallets();
+    delete ht_sender;
+    delete ht_recver;
+    delete ht_transactions;
+    delete ht_bitcoin;
     return 1;
   }
   cout<<"read from file "<<transactionsFile<<endl;
@@ -460,6 +468,7 @@ int main(int argc, char *argv[]){
   return 0;
 }
 
+//----------------------------------------- INIT_USRS -----------------------------------
 int init_urs(char* file_name){
   char *buffer=NULL, *usr_id, *tmp;
   size_t len=0;
@@ -475,6 +484,8 @@ int init_urs(char* file_name){
        usr_id = strtok(buffer, " ");
        if(ht_sender->find(usr_id)!=nullptr){//check if usr exists
          cerr << "init_urs user already exisxts "<<usr_id << '\n';
+         free(buffer);
+         fclose(fp);
          return 2;
        }
        //insert new user
@@ -492,6 +503,8 @@ int init_urs(char* file_name){
             break;
           if(ht_bitcoin->find(tmp)!=nullptr){//check if coin exists
             cerr << "init_urs bitcoin already exisxts "<<tmp << '\n';
+            free(buffer);
+            fclose(fp);
             return 2;
           }
           //insert new coin
@@ -511,6 +524,7 @@ int init_urs(char* file_name){
   return 0;
 }
 
+//----------------------------------------- MAKE_TRANSACTION -----------------------------------
 int make_transaction(transaction_struct *trans){
   if(!trans->sender->is_transaction_possible(trans)){//if it can not be done
     cout<<"not enought money, transaction "<<trans->trans_id<<" can not be done\n";
@@ -561,6 +575,7 @@ int make_transaction(transaction_struct *trans){
   return 0;
 }
 
+//----------------------------------------- INIT_TRANSACTIONS -----------------------------------
 int init_transactions(char* file_name){
   char *buffer=NULL, *tmp;
   size_t len=0;
@@ -579,6 +594,8 @@ int init_transactions(char* file_name){
        tmp = strtok(buffer, " ");
        if(ht_transactions->find(tmp)!=nullptr){//check if trans_id exists
          cerr << "init_transactions trans_id already exisxts "<<tmp << '\n';
+         free(buffer);
+         fclose(fp);
          return 1;
        }
        if(strlen(curr_trans_id)<strlen(tmp))//save the longest transation id (ised in get_valid_transaction_id)
@@ -590,6 +607,8 @@ int init_transactions(char* file_name){
        if(ht_sender->find(tmp)==nullptr){//check if sender_id exists
          cerr << "init_transactions sender does not exisxt "<<tmp << '\n';
          delete new_trans;
+         free(buffer);
+         fclose(fp);
          return 2;
        }
        new_trans->sender=ht_sender->find(tmp)->wallet;
@@ -598,6 +617,8 @@ int init_transactions(char* file_name){
        if(ht_sender->find(tmp)==nullptr){//check if recver_id exists
          cerr << "init_transactions recver does not exisxt "<<tmp << '\n';
          delete new_trans;
+         free(buffer);
+         fclose(fp);
          return 2;
        }
        new_trans->recver=ht_sender->find(tmp)->wallet;
@@ -628,6 +649,7 @@ int init_transactions(char* file_name){
   return 0;
 }
 
+//----------------------------------------- GET_VALID_TRANSACTION_ID -----------------------------------
 void get_valid_transaction_id(){
   char tmp[51];
   sprintf(tmp, "a%d", trans_id_append);//append a%d
